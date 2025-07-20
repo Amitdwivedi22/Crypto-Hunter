@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import { TrendingUp, TrendingDown, Search, Star, Menu, X, User, LogIn, LogOut } from 'lucide-react';
 import LoginPage from './components/LoginPage';
+import About from './components/About';
 
 const App = () => {
   const [cryptoData, setCryptoData] = useState([]);
@@ -11,7 +12,12 @@ const App = () => {
   const [currency, setCurrency] = useState('USD');
   const [loading, setLoading] = useState(true);
   const [showLogin, setShowLogin] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
   const [user, setUser] = useState(null);
+
+  const handleBackToHome = () => {
+    setShowAbout(false);
+  };
 
   // Mock cryptocurrency data
   const mockCryptoData = [
@@ -234,10 +240,23 @@ const App = () => {
                 <option value="EUR">EUR</option>
                 <option value="GBP">GBP</option>
               </select>
-              <button className="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition-colors">
-                <LogIn className="w-4 h-4" />
-                <span>Login</span>
-              </button>
+              {!user ? (
+                <button 
+                  onClick={() => setShowLogin(true)} 
+                  className="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition-colors"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Login</span>
+                </button>
+              ) : (
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -250,103 +269,109 @@ const App = () => {
         />
       )}
 
-      {/* Hero Section */}
-      <Hero />
+      {showAbout ? (
+        <About onBack={handleBackToHome} />
+      ) : (
+        <>
+          {/* Hero Section */}
+          <Hero />
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search Bar */}
-        <div className="mb-8">
-          <div className="relative max-w-md mx-auto">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
+          {/* Main Content */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Search Bar */}
+            <div className="mb-8">
+              <div className="relative max-w-md mx-auto">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search For a Crypto Currency..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-600 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
             </div>
-            <input
-              type="text"
-              placeholder="Search For a Crypto Currency..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full pl-10 pr-3 py-3 border border-gray-600 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-        </div>
 
-        {/* Crypto Table */}
-        <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-          <div className="overflow-x-auto">
-            {loading ? (
-              <LoadingSpinner />
-            ) : (
-              <table className="min-w-full divide-y divide-gray-700">
-                <thead className="bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Coin</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">24h Change</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Market Cap</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Volume</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-gray-800 divide-y divide-gray-700">
-                  {filteredCryptos.map((crypto, index) => (
-                    <tr key={crypto.id} className="hover:bg-gray-700 transition-colors cursor-pointer">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <img
-                            className="h-10 w-10 rounded-full mr-3"
-                            src={crypto.image}
-                            alt={crypto.name}
-                            onError={(e) => {
-                              e.target.onerror = null; // Prevent infinite loop
-                              e.target.src = `https://via.placeholder.com/40/3B82F6/FFFFFF?text=${crypto.symbol[0]}`;
-                            }}
-                          />
-                          <div>
-                            <div className="text-sm font-medium text-white">{crypto.name}</div>
-                            <div className="text-sm text-gray-400">{crypto.symbol.toUpperCase()}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-medium">
-                        {formatPrice(crypto.current_price)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className={`flex items-center ${crypto.price_change_percentage_24h > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                          {crypto.price_change_percentage_24h > 0 ? 
-                            <TrendingUp className="w-4 h-4 mr-1" /> : 
-                            <TrendingDown className="w-4 h-4 mr-1" />
-                          }
-                          <span className="font-medium">
-                            {crypto.price_change_percentage_24h.toFixed(2)}%
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {formatMarketCap(crypto.market_cap)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {formatMarketCap(crypto.total_volume)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <button className="text-yellow-400 hover:text-yellow-300 transition-colors">
-                          <Star className="w-5 h-5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            {/* Crypto Table */}
+            <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+              <div className="overflow-x-auto">
+                {loading ? (
+                  <LoadingSpinner />
+                ) : (
+                  <table className="min-w-full divide-y divide-gray-700">
+                    <thead className="bg-gray-700">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Coin</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Price</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">24h Change</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Market Cap</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Volume</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-gray-800 divide-y divide-gray-700">
+                      {filteredCryptos.map((crypto, index) => (
+                        <tr key={crypto.id} className="hover:bg-gray-700 transition-colors cursor-pointer">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <img
+                                className="h-10 w-10 rounded-full mr-3"
+                                src={crypto.image}
+                                alt={crypto.name}
+                                onError={(e) => {
+                                  e.target.onerror = null; // Prevent infinite loop
+                                  e.target.src = `https://via.placeholder.com/40/3B82F6/FFFFFF?text=${crypto.symbol[0]}`;
+                                }}
+                              />
+                              <div>
+                                <div className="text-sm font-medium text-white">{crypto.name}</div>
+                                <div className="text-sm text-gray-400">{crypto.symbol.toUpperCase()}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-medium">
+                            {formatPrice(crypto.current_price)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <div className={`flex items-center ${crypto.price_change_percentage_24h > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                              {crypto.price_change_percentage_24h > 0 ? 
+                                <TrendingUp className="w-4 h-4 mr-1" /> : 
+                                <TrendingDown className="w-4 h-4 mr-1" />
+                              }
+                              <span className="font-medium">
+                                {crypto.price_change_percentage_24h.toFixed(2)}%
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {formatMarketCap(crypto.market_cap)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                            {formatMarketCap(crypto.total_volume)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <button className="text-yellow-400 hover:text-yellow-300 transition-colors">
+                              <Star className="w-5 h-5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+
+            {filteredCryptos.length === 0 && !loading && (
+              <div className="text-center py-12">
+                <p className="text-gray-400 text-lg">No cryptocurrencies found matching your search.</p>
+              </div>
             )}
           </div>
-        </div>
-
-        {filteredCryptos.length === 0 && !loading && (
-          <div className="text-center py-12">
-            <p className="text-gray-400 text-lg">No cryptocurrencies found matching your search.</p>
-          </div>
-        )}
-      </div>
+        </>
+      )}
 
       {/* Footer */}
       <footer className="bg-gray-800 border-t border-gray-700 mt-16">
@@ -357,7 +382,12 @@ const App = () => {
               Your ultimate destination for cryptocurrency tracking and analysis
             </p>
             <div className="flex justify-center space-x-6">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">About</a>
+              <button 
+                onClick={() => setShowAbout(true)} 
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                About
+              </button>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">Contact</a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy</a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">Terms</a>
