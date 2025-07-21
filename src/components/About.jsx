@@ -15,7 +15,7 @@ const About = ({ onBack }) => {
         <div className="flex items-center mb-8">
           <button
             onClick={onBack}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+            className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md transition-colors"
           >
             Back to Home
           </button>
