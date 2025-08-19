@@ -128,7 +128,7 @@ const App = () => {
   );
 
   const Hero = () => (
-    <div className="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white py-20 px-4 overflow-hidden">
+    <div className="relative bg-gradient-to-br from-blue-800 via-purple-800 to-indigo-900 text-white py-20 px-4 overflow-hidden">
       <div className="absolute inset-0 bg-black opacity-50"></div>
       <div className="absolute inset-0">
         <div className="absolute top-10 left-10 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
